@@ -1,9 +1,12 @@
+// app/layout.tsx (or RootLayout)
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto, Saira } from "next/font/google";
 import "./globals.css";
 import { TanstackProviders } from "@/components/tanstackprovider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import ClientSessionWrapper from "@/components/sessionProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,13 +40,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable}  ${saira.variable}  ${roboto.variable}  antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${saira.variable} ${roboto.variable} antialiased`}
       >
-        <TanstackProviders>
-          <Navbar />
-          {children}
-          <Footer />
-        </TanstackProviders>
+        <ClientSessionWrapper>
+          <TanstackProviders>
+            <Navbar />
+            {children}
+            <Footer />
+          </TanstackProviders>
+        </ClientSessionWrapper>
       </body>
     </html>
   );

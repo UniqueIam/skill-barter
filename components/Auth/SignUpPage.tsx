@@ -52,7 +52,7 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-primary">
+    <div className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gray-primary mt-[10vh]">
       <div className="absolute inset-0 bg-gradient-to-br from-gray-primary to-gray-900 backdrop-blur-xl opacity-80 z-0" />
 
       <div className="relative z-10 w-full max-w-md space-y-8 bg-gray-900/80 backdrop-blur-lg p-8 rounded-lg shadow-2xl">

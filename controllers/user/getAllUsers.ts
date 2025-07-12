@@ -1,31 +1,35 @@
 import { prisma } from "@/db/prisma";
 import { NextResponse, NextRequest } from "next/server";
 
-export const getAllUsers = async (req: NextRequest) => {
+export const getAllUsers = async (_req: NextRequest) => {
   try {
     const users = await prisma.user.findMany({
+      where: {
+        isPublic: true,
+        role: "USER",
+      },
       select: {
         id: true,
         username: true,
-        email: true,
-        role: true,
         profilePhoto: true,
-        isPublic: true,
-        createdAt: true,
-
+        location: true,
+        availabilities: true,
         skillsOffered: {
           select: {
             skill: {
-              select: { id: true, name: true },
+              select: { name: true },
             },
           },
         },
         skillsWanted: {
           select: {
             skill: {
-              select: { id: true, name: true },
+              select: { name: true },
             },
           },
+        },
+        feedbackReceived: {
+          select: { rating: true },
         },
       },
       orderBy: {
@@ -33,25 +37,32 @@ export const getAllUsers = async (req: NextRequest) => {
       },
     });
 
-    const usersWithRatings = await Promise.all(
-      users.map(async (user) => {
-        const ratings = await prisma.feedback.findMany({
-          where: { toUserId: user.id },
-          select: { rating: true },
-        });
+    const professionals = users.map((user) => {
+      const ratings = user.feedbackReceived.map((f) => f.rating);
+      const averageRating =
+        ratings.length > 0
+          ? parseFloat(
+              (ratings.reduce((acc, r) => acc + r, 0) / ratings.length).toFixed(
+                1
+              )
+            )
+          : 0;
 
-        return {
-          ...user,
-          skillsOffered: user.skillsOffered.map((s) => s.skill),
-          skillsWanted: user.skillsWanted.map((s) => s.skill),
-          ratings: ratings.map((r) => r.rating),
-        };
-      })
-    );
+      return {
+        id: user.id,
+        name: user.username,
+        avatar: user.profilePhoto || "",
+        location: user.location || "Unknown",
+        rating: averageRating,
+        available: user.availabilities.length > 0,
+        skillsOffered: user.skillsOffered.map((s) => s.skill.name),
+        skillsWanted: user.skillsWanted.map((s) => s.skill.name),
+      };
+    });
 
-    return NextResponse.json({ users: usersWithRatings }, { status: 200 });
+    return NextResponse.json({ users: professionals }, { status: 200 });
   } catch (error) {
-    console.error("[GET_USERS_ERROR]", error);
+    console.error("[GET_ALL_USERS_ERROR]", error);
     return NextResponse.json(
       { error: "Failed to fetch users" },
       { status: 500 }

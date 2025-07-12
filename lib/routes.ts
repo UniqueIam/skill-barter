@@ -6,7 +6,7 @@ export const API_ROUTES = {
     VERIFY_OTP: `${BASE_URL}/api/otp/verify`,
   },
   USER: {
-    GETALL: `${BASE_URL}/api/user/get-all`,
-    GETONE: `${BASE_URL}/api/user/get-one`,
+    GETALL: `${BASE_URL}/api/users/get-all`,
+    GETONE: `${BASE_URL}/api/users/get-one`,
   },
 } as const;

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Users, Menu, X } from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
 
 interface NavItem {
   name: string;
@@ -13,13 +14,14 @@ interface NavItem {
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
   const pathname = usePathname();
+  const router = useRouter(); // ✅ useRouter instance
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
-
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -27,6 +29,7 @@ const Navbar: React.FC = () => {
   const navItems: NavItem[] = [
     { name: "Home", path: "/" },
     { name: "Browse Users", path: "/browse" },
+    ...(session ? [{ name: "Dashboard", path: "/dashboard" }] : []),
   ];
 
   return (
@@ -39,9 +42,7 @@ const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group">
-            <div className="relative">
-              <Users className="h-8 w-8 transition-transform duration-300 group-hover:scale-110" />
-            </div>
+            <Users className="h-8 w-8 transition-transform duration-300 group-hover:scale-110" />
             <span className="text-xl font-bold text-gradient">SkillSwap</span>
           </Link>
 
@@ -62,14 +63,26 @@ const Navbar: React.FC = () => {
             ))}
           </div>
 
-          {/* Desktop Login button */}
+          {/* Desktop Login/Logout */}
           <div className="hidden md:block">
-            <button className="text-md px-7 py-1 rounded-full border-2 border-teal-500/30 hover:border-teal-500/50 hover:bg-teal-500/10 hover:cursor-pointer transition-all duration-300 inline-flex items-center">
-              Login / Signup
-            </button>
+            {!session ? (
+              <button
+                onClick={() => router.push("/auth/signin")} // ✅ navigate to signin
+                className="text-md px-7 py-1 rounded-full border-2 border-teal-500/30 hover:border-teal-500/50 hover:bg-teal-500/10 hover:cursor-pointer transition-all duration-300 inline-flex items-center"
+              >
+                Login / Signup
+              </button>
+            ) : (
+              <button
+                onClick={() => signOut()}
+                className="text-md px-7 py-1 rounded-full border-2 border-teal-500/30 hover:border-teal-500/50 hover:bg-teal-500/10 hover:cursor-pointer transition-all duration-300 inline-flex items-center"
+              >
+                Logout
+              </button>
+            )}
           </div>
 
-          {/* Mobile Menu button */}
+          {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             className="md:hidden p-2 rounded-lg border border-border/50 bg-card/50 hover:bg-card transition-colors"
@@ -102,7 +115,21 @@ const Navbar: React.FC = () => {
               </Link>
             ))}
             <div className="pt-3 border-t border-border/50">
-              <button className="w-full btn-glow">Login / Signup</button>
+              {!session ? (
+                <button
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    router.push("/auth/signin"); // ✅ navigate on mobile too
+                  }}
+                  className="w-full btn-glow"
+                >
+                  Login / Signup
+                </button>
+              ) : (
+                <button onClick={() => signOut()} className="w-full btn-glow">
+                  Logout
+                </button>
+              )}
             </div>
           </div>
         </div>
