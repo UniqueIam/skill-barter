@@ -2,7 +2,6 @@ import { prisma } from "@/db/prisma";
 import { sendOTPEmail } from "@/lib/email/mailer";
 import { generateOTP } from "@/lib/email/otp";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
 import { NextRequest, NextResponse } from "next/server";
 
 export const handleSignup = async (req: NextRequest) => {
@@ -69,56 +68,4 @@ export const handleSignup = async (req: NextRequest) => {
   }
 };
 
-export const handleSignIn = async (req: NextRequest) => {
-  try {
-    const { username, password } = await req.json();
 
-    if (!username || !password) {
-      return NextResponse.json(
-        { error: "Username and password are required" },
-        { status: 400 }
-      );
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { username },
-    });
-
-    if (!user) {
-      return NextResponse.json(
-        { error: "User not found" },
-        { status: 404 }
-      );
-    }
-
-    if (!user.verified) {
-      return NextResponse.json(
-        { error: "Please verify your email before signing in" },
-        { status: 401 }
-      );
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      return NextResponse.json(
-        { error: "Invalid username or password" },
-        { status: 401 }
-      );
-    }
-
-    // Optional: add JWT logic here
-    const token = jwt.
-
-    return NextResponse.json(
-      { message: "Login successful", userId: user.id },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error("SignIn error:", error);
-    return NextResponse.json(
-      { error: "Internal Server Error" },
-      { status: 500 }
-    );
-  }
-};
