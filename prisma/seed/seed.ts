@@ -4,7 +4,6 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 async function main() {
-  // List of skill names to insert if they don't exist already
   const skillNames = [
     "Web Development",
     "Graphic Design",
@@ -16,7 +15,6 @@ async function main() {
     "Cooking",
   ];
 
-  // Check if skills exist, and only create them if they don't
   for (const skillName of skillNames) {
     const existingSkill = await prisma.skill.findUnique({
       where: { name: skillName },
@@ -34,7 +32,7 @@ async function main() {
       username: "alice",
       email: "alice@example.com",
       location: "Bangalore",
-      password: "password123", // Default password to hash
+      password: "password123",
     },
     {
       username: "bob",
@@ -69,12 +67,12 @@ async function main() {
   ];
 
   for (const user of users) {
-    const hashedPassword = await bcrypt.hash(user.password, 10); // Hash the password
+    const hashedPassword = await bcrypt.hash(user.password, 10);
 
     await prisma.user.create({
       data: {
         ...user,
-        password: hashedPassword, // Store hashed password
+        password: hashedPassword,
         profilePhoto: null,
         isPublic: true,
         role: "USER",
