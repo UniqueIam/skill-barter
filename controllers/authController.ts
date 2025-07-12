@@ -64,8 +64,9 @@ export const handleSignup = async (req: NextRequest) => {
     );
   } catch (error) {
     console.error("Signup error:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 }
+    );
   }
 };
-
-
