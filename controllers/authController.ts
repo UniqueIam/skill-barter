@@ -1,12 +1,13 @@
 import { prisma } from "@/db/prisma";
 import { sendOTPEmail } from "@/lib/email/mailer";
 import { generateOTP } from "@/lib/email/otp";
+import { UserSignup } from "@/zodSchemas/signUpSchema";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
-export const handleSignup = async (req: NextRequest) => {
+export const handleSignup = async (req: NextRequest, data: UserSignup) => {
   try {
-    const { username, email, password } = await req.json();
+    const { username, email, password } = data;
 
     if (!username || !email || !password) {
       return NextResponse.json(
