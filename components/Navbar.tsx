@@ -26,10 +26,16 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Add "Profile" link when the user is logged in
   const navItems: NavItem[] = [
     { name: "Home", path: "/" },
     { name: "Browse Users", path: "/browse" },
-    ...(session ? [{ name: "Dashboard", path: "/dashboard" }] : []),
+    ...(session
+      ? [
+          { name: "Dashboard", path: "/user/dashboard" },
+          { name: "Profile", path: "/user/profile" }, // Profile link
+        ]
+      : []),
   ];
 
   return (

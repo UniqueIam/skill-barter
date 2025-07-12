@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Search, ChevronDown } from "lucide-react";
 import ProfessionalCard from "./ProfessionalCard";
+import SkillSwapModal from "../skillSwapModal";
 import { API_ROUTES } from "@/lib/routes";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
@@ -13,7 +14,7 @@ interface Professional {
   avatar: string;
   location: string;
   rating: number;
-  maxRating: number; // added to match component
+  maxRating: number;
   available: boolean;
   skillsOffered: string[];
   skillsWanted: string[];
@@ -23,6 +24,8 @@ const DiscoverProfessionals: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSkill, setSelectedSkill] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<Professional | null>(null);
 
   const { data, isLoading } = useQuery({
     queryKey: ["get-all-users"],
@@ -72,7 +75,6 @@ const DiscoverProfessionals: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white pt-20">
-      {/* Header */}
       <div className="text-center py-16 px-4">
         <h1 className="text-4xl md:text-5xl font-bold mb-6">
           Discover <span className="text-teal-400">Talented Professionals</span>
@@ -87,7 +89,6 @@ const DiscoverProfessionals: React.FC = () => {
       <div className="max-w-6xl mx-auto px-4 mb-8">
         <div className="bg-gray-900 rounded-xl p-6 shadow-lg">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Search Input */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
@@ -99,12 +100,11 @@ const DiscoverProfessionals: React.FC = () => {
               />
             </div>
 
-            {/* Skill Filter */}
             <div className="relative">
               <select
                 value={selectedSkill}
                 onChange={(e) => setSelectedSkill(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-teal-400 focus:outline-none text-white appearance-none cursor-pointer"
+                className="w-full px-4 py-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-teal-400 focus:outline-none text-white"
               >
                 <option value="">Filter by skill</option>
                 {allSkills.map((skill) => (
@@ -116,12 +116,11 @@ const DiscoverProfessionals: React.FC = () => {
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
             </div>
 
-            {/* Location Filter */}
             <div className="relative">
               <select
                 value={selectedLocation}
                 onChange={(e) => setSelectedLocation(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-teal-400 focus:outline-none text-white appearance-none cursor-pointer"
+                className="w-full px-4 py-3 bg-gray-800 rounded-lg border border-gray-600 focus:border-teal-400 focus:outline-none text-white"
               >
                 <option value="">Filter by location</option>
                 {locations.map((location) => (
@@ -136,9 +135,15 @@ const DiscoverProfessionals: React.FC = () => {
         </div>
       </div>
 
-      {/* Professional Cards */}
+      {/* Cards */}
       <div className="max-w-6xl mx-auto px-4 pb-16">
-        <ProfessionalCard filteredProfessionals={filteredProfessionals} />
+        <ProfessionalCard
+          filteredProfessionals={filteredProfessionals}
+          onRequest={(user) => {
+            setSelectedUser(user);
+            setShowModal(true);
+          }}
+        />
 
         {isLoading && (
           <p className="text-center text-gray-400 mt-10">
@@ -164,6 +169,21 @@ const DiscoverProfessionals: React.FC = () => {
           </div>
         )}
       </div>
+
+      {showModal && selectedUser && (
+        <SkillSwapModal
+          user={{
+            name: selectedUser.name,
+            skillsOffered: selectedUser.skillsOffered,
+            skillsWanted: selectedUser.skillsWanted,
+          }}
+          mySkills={["ReactJS", "Node.js", "TypeScript"]} // Replace with real user data
+          onClose={() => {
+            setShowModal(false);
+            setSelectedUser(null);
+          }}
+        />
+      )}
     </div>
   );
 };

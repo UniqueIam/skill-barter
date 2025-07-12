@@ -51,8 +51,8 @@ const Dashboard = () => {
       id: "1",
       user: {
         id: "cmczw251l0000qzoszvv0noek",
-        username: "abcxyz123",
-        email: "abc@gmail.com",
+        username: "vivek tiwari",
+        email: "vivektiwari234@gmail.com",
         role: "USER",
         isPublic: true,
         createdAt: "2025-07-12T06:52:41.865Z",
@@ -424,3 +424,301 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// todo=  later fix this for now keep dummy data
+
+// export default Dashboard;
+// "use client";
+
+// import React, { useEffect, useState } from "react";
+// import {
+//   Check,
+//   X,
+//   Calendar,
+//   MessageCircle,
+//   MapPin,
+//   User2Icon,
+// } from "lucide-react";
+// import axios from "axios";
+
+// interface Skill {
+//   id: string;
+//   name: string;
+// }
+
+// interface UserProfile {
+//   id: string;
+//   username: string;
+//   email: string;
+//   role: string;
+//   isPublic: boolean;
+//   createdAt: string;
+//   profilePhoto?: string | null;
+//   location?: string | null;
+//   skillsOffered: Skill[];
+//   skillsWanted: Skill[];
+//   availabilities: any[];
+//   ratings: any[];
+// }
+
+// interface SwapRequest {
+//   id: string;
+//   user: UserProfile;
+//   requestedAt: string;
+//   message: string;
+//   status: "pending" | "accepted" | "rejected";
+//   requestType: "skill_exchange" | "mentorship";
+// }
+
+// export const Dashboard = () => {
+//   const [requests, setRequests] = useState<SwapRequest[]>([]);
+//   const [activeTab, setActiveTab] = useState<
+//     "all" | "pending" | "accepted" | "rejected"
+//   >("all");
+//   const [loading, setLoading] = useState<boolean>(true);
+
+//   useEffect(() => {
+//     const fetchRequests = async () => {
+//       try {
+//         const res = await axios.get("/api/swap/incoming");
+//         setRequests(res.data.swapRequests);
+//       } catch (err) {
+//         console.error("Failed to fetch swap requests:", err);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchRequests();
+//   }, []);
+
+//   const handleAcceptRequest = (id: string) => {
+//     setRequests((prev) =>
+//       prev.map((req) => (req.id === id ? { ...req, status: "accepted" } : req))
+//     );
+//   };
+
+//   const handleDeclineRequest = (id: string) => {
+//     setRequests((prev) =>
+//       prev.map((req) => (req.id === id ? { ...req, status: "rejected" } : req))
+//     );
+//   };
+
+//   const filteredRequests =
+//     activeTab === "all"
+//       ? requests
+//       : requests.filter((req) => req.status === activeTab);
+
+//   const tabCounts = {
+//     all: requests.length,
+//     pending: requests.filter((r) => r.status === "pending").length,
+//     accepted: requests.filter((r) => r.status === "accepted").length,
+//     rejected: requests.filter((r) => r.status === "rejected").length,
+//   };
+
+//   const formatTimeAgo = (dateString: string) => {
+//     const date = new Date(dateString);
+//     const now = new Date();
+//     const diff = now.getTime() - date.getTime();
+//     const hours = Math.floor(diff / (1000 * 60 * 60));
+
+//     if (hours < 24) return `${hours} hours ago`;
+//     const days = Math.floor(hours / 24);
+//     if (days < 7) return `${days} days ago`;
+//     const weeks = Math.floor(days / 7);
+//     if (weeks < 4) return `${weeks} weeks ago`;
+//     const months = Math.floor(days / 30);
+//     return `${months} months ago`;
+//   };
+
+//   const TabButton = ({
+//     tab,
+//     label,
+//     count,
+//     isActive,
+//   }: {
+//     tab: typeof activeTab;
+//     label: string;
+//     count: number;
+//     isActive: boolean;
+//   }) => (
+//     <button
+//       onClick={() => setActiveTab(tab)}
+//       className={`px-4 py-2 rounded-full text-sm font-medium transition-colors flex items-center gap-2 ${
+//         isActive
+//           ? "bg-teal-500 text-white"
+//           : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+//       }`}
+//     >
+//       {label}
+//       <span
+//         className={`px-2 py-1 rounded-full text-xs ${
+//           isActive ? "bg-teal-600" : "bg-gray-600"
+//         }`}
+//       >
+//         {count}
+//       </span>
+//     </button>
+//   );
+
+//   return (
+//     <div className="min-h-screen bg-gray-950 text-white px-6 pt-28 pb-20">
+//       <div className="max-w-4xl mx-auto">
+//         <div className="text-center mb-8">
+//           <h1 className="text-4xl font-bold text-teal-400 mb-2">Dashboard</h1>
+//           <p className="text-gray-400">
+//             Manage your incoming skill swap requests and collaborations.
+//           </p>
+//         </div>
+
+//         <div className="bg-gray-900 rounded-lg p-4 mb-6">
+//           <div className="flex gap-4 flex-wrap">
+//             {(["all", "pending", "accepted", "rejected"] as const).map(
+//               (tab) => (
+//                 <TabButton
+//                   key={tab}
+//                   tab={tab}
+//                   label={tab[0].toUpperCase() + tab.slice(1)}
+//                   count={tabCounts[tab]}
+//                   isActive={activeTab === tab}
+//                 />
+//               )
+//             )}
+//           </div>
+//         </div>
+
+//         {loading ? (
+//           <div className="text-center text-gray-400">Loading requests...</div>
+//         ) : filteredRequests.length === 0 ? (
+//           <div className="bg-gray-900 rounded-lg p-8 text-center">
+//             <MessageCircle className="mx-auto mb-4 text-gray-500" size={48} />
+//             <p className="text-gray-400">No {activeTab} requests found.</p>
+//           </div>
+//         ) : (
+//           <div className="space-y-4">
+//             {filteredRequests.map((req) => (
+//               <div key={req.id} className="bg-gray-900 rounded-lg p-6">
+//                 <div className="flex items-start justify-between mb-4">
+//                   <div className="flex items-center gap-3">
+//                     <div className="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden border border-gray-700">
+//                       {req.user.profilePhoto ? (
+//                         <img
+//                           src={req.user.profilePhoto}
+//                           alt="profile"
+//                           className="w-full h-full object-cover"
+//                         />
+//                       ) : (
+//                         <User2Icon className="text-gray-400 h-6 w-6" />
+//                       )}
+//                     </div>
+//                     <div>
+//                       <h3 className="font-semibold text-lg">
+//                         @{req.user.username}
+//                       </h3>
+//                       <div className="flex items-center gap-3 text-sm text-gray-400">
+//                         <div className="flex items-center gap-1">
+//                           <Calendar size={14} />
+//                           {formatTimeAgo(req.requestedAt)}
+//                         </div>
+//                         {req.user.location && (
+//                           <div className="flex items-center gap-1">
+//                             <MapPin size={14} />
+//                             {req.user.location}
+//                           </div>
+//                         )}
+//                       </div>
+//                     </div>
+//                   </div>
+
+//                   <div
+//                     className={`px-3 py-1 rounded-full text-xs font-medium ${
+//                       req.status === "pending"
+//                         ? "bg-teal-500 text-white"
+//                         : req.status === "accepted"
+//                         ? "bg-green-500 text-white"
+//                         : "bg-red-500 text-white"
+//                     }`}
+//                   >
+//                     {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
+//                   </div>
+//                 </div>
+
+//                 <div className="grid md:grid-cols-2 gap-6 mb-4">
+//                   <div>
+//                     <h4 className="text-sm font-medium text-gray-400 mb-2">
+//                       They're offering:
+//                     </h4>
+//                     <div className="flex flex-wrap gap-2">
+//                       {req.user.skillsOffered.map((s) => (
+//                         <span
+//                           key={s.id}
+//                           className="px-3 py-1 bg-teal-500/10 text-teal-500 border border-teal-500/50 rounded-full text-sm"
+//                         >
+//                           {s.name}
+//                         </span>
+//                       ))}
+//                     </div>
+//                   </div>
+//                   <div>
+//                     <h4 className="text-sm font-medium text-gray-400 mb-2">
+//                       They want to learn:
+//                     </h4>
+//                     <div className="flex flex-wrap gap-2">
+//                       {req.user.skillsWanted.map((s) => (
+//                         <span
+//                           key={s.id}
+//                           className="px-3 py-1 bg-gray-600/10 text-gray-400 border border-gray-500/50 rounded-full text-sm"
+//                         >
+//                           {s.name}
+//                         </span>
+//                       ))}
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                 <div className="mb-6">
+//                   <h4 className="text-sm font-medium text-gray-400 mb-2">
+//                     Message:
+//                   </h4>
+//                   <p className="text-gray-300 leading-relaxed">{req.message}</p>
+//                 </div>
+
+//                 {req.status === "pending" && (
+//                   <div className="flex gap-3">
+//                     <button
+//                       onClick={() => handleAcceptRequest(req.id)}
+//                       className="flex-1 bg-teal-500 hover:bg-teal-600 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+//                     >
+//                       <Check size={18} />
+//                       Accept
+//                     </button>
+//                     <button
+//                       onClick={() => handleDeclineRequest(req.id)}
+//                       className="flex-1 border border-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg flex items-center justify-center gap-2"
+//                     >
+//                       <X size={18} />
+//                       Decline
+//                     </button>
+//                   </div>
+//                 )}
+
+//                 {req.status === "accepted" && (
+//                   <div className="text-center py-2 text-green-400 font-medium">
+//                     ✓ Request Accepted - Contact details shared
+//                   </div>
+//                 )}
+//                 {req.status === "rejected" && (
+//                   <div className="text-center py-2 text-red-400 font-medium">
+//                     ✗ Request Declined
+//                   </div>
+//                 )}
+//               </div>
+//             ))}
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Dashboard;
