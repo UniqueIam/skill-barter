@@ -11,13 +11,44 @@ export const getAllUsers = async (req: NextRequest) => {
         role: true,
         isPublic: true,
         createdAt: true,
+
+        skillsOffered: {
+          select: {
+            skill: {
+              select: { id: true, name: true },
+            },
+          },
+        },
+        skillsWanted: {
+          select: {
+            skill: {
+              select: { id: true, name: true },
+            },
+          },
+        },
       },
       orderBy: {
         createdAt: "desc",
       },
     });
 
-    return NextResponse.json({ users }, { status: 200 });
+    const usersWithRatings = await Promise.all(
+      users.map(async (user) => {
+        const ratings = await prisma.feedback.findMany({
+          where: { toUserId: user.id },
+          select: { rating: true },
+        });
+
+        return {
+          ...user,
+          skillsOffered: user.skillsOffered.map((s) => s.skill),
+          skillsWanted: user.skillsWanted.map((s) => s.skill),
+          ratings: ratings.map((r) => r.rating), 
+        };
+      })
+    );
+
+    return NextResponse.json({ users: usersWithRatings }, { status: 200 });
   } catch (error) {
     console.error("[GET_USERS_ERROR]", error);
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
