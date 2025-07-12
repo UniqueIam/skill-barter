@@ -1,0 +1,127 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum SwapStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+}
+
+enum DayOfWeek {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+  EVERYDAY
+}
+
+// todo: location table with city, state...
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  email        String   @unique
+  profilePhoto String?
+  location     String?
+  isPublic     Boolean  @default(true)
+  role         UserRole @default(USER)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  skillsOffered  UserSkillOffered[]
+  skillsWanted   UserSkillWanted[]
+  availabilities Availability[]
+
+  swapRequestsSent     SwapRequest[] @relation("SwapRequestSentByUser")
+  swapRequestsReceived SwapRequest[] @relation("SwapRequestReceivedByUser")
+
+  feedbackGiven    Feedback[] @relation("FeedbackGivenByUser")
+  feedbackReceived Feedback[] @relation("FeedbackReceivedByUser")
+
+  // verfication
+  verified  Boolean   @default(false)
+  otp       String?
+  otpExpiry DateTime?
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  usersOffering UserSkillOffered[]
+  usersWanting  UserSkillWanted[]
+  swapsOffered  SwapRequest[]      @relation("SwapSkillOffered")
+  swapsWanted   SwapRequest[]      @relation("SwapSkillWanted")
+}
+
+model UserSkillOffered {
+  id      String @id @default(cuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  skill   Skill  @relation(fields: [skillId], references: [id])
+  skillId String
+}
+
+model UserSkillWanted {
+  id      String @id @default(cuid())
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String
+  skill   Skill  @relation(fields: [skillId], references: [id])
+  skillId String
+}
+
+model Availability {
+  id        String    @id @default(cuid())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  day       DayOfWeek
+  startTime String
+  endTime   String
+}
+
+model SwapRequest {
+  id         String @id @default(cuid())
+  fromUser   User   @relation("SwapRequestSentByUser", fields: [fromUserId], references: [id])
+  fromUserId String
+  toUser     User   @relation("SwapRequestReceivedByUser", fields: [toUserId], references: [id])
+  toUserId   String
+
+  skillOffered   Skill  @relation("SwapSkillOffered", fields: [skillOfferedId], references: [id])
+  skillOfferedId String
+
+  skillWanted   Skill  @relation("SwapSkillWanted", fields: [skillWantedId], references: [id])
+  skillWantedId String
+
+  status    SwapStatus @default(PENDING)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Feedback {
+  id      String  @id @default(cuid())
+  rating  Int
+  comment String?
+
+  fromUser   User   @relation("FeedbackGivenByUser", fields: [fromUserId], references: [id])
+  fromUserId String
+
+  toUser   User   @relation("FeedbackReceivedByUser", fields: [toUserId], references: [id])
+  toUserId String
+
+  createdAt DateTime @default(now())
+}
