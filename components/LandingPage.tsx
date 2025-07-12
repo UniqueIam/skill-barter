@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import Navbar from "./Navbar";
 import {
   ArrowRight,
   Users,
@@ -78,7 +79,7 @@ const Home = () => {
           }`}
         >
           <div className="space-y-8">
-            <div className="inline-flex items-center px-4 py-2 rounded-full glass-card text-sm mb-8">
+            <div className="inline-flex items-center px-4 py-2 rounded-full glass-card text-sm mb-8 mt-20">
               <Star className="h-4 w-4 text-teal-400 mr-2" />
               <span className="text-teal-300">
                 Trusted by 10,000+ professionals worldwide
@@ -279,41 +280,6 @@ const Home = () => {
           <div className="absolute bottom-20 right-10 w-40 h-40 bg-teal-400/5 rounded-full blur-xl" />
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h3 className="text-2xl font-bold text-gradient mb-4">SkillSwap</h3>
-            <p className="text-slate-400 mb-8">
-              Connecting professionals worldwide through skill exchange
-            </p>
-            <div className="flex justify-center space-x-8 text-slate-400">
-              <Link
-                href="/privacy"
-                className="hover:text-teal-400 transition-colors"
-              >
-                Privacy
-              </Link>
-              <Link
-                href="/terms"
-                className="hover:text-teal-400 transition-colors"
-              >
-                Terms
-              </Link>
-              <Link
-                href="/contact"
-                className="hover:text-teal-400 transition-colors"
-              >
-                Contact
-              </Link>
-            </div>
-            <div className="mt-8 text-slate-500 text-sm">
-              © 2025 SkillSwap. All rights reserved.
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

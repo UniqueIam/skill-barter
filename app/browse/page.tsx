@@ -1,5 +1,14 @@
+"use client";
+
+import BrowseUsers from "@/components/BrowseUsers/BrowseUsers";
+import React from "react";
+
 const page = () => {
-  return <div>browse page - to show other user profile</div>;
+  return (
+    <section>
+      <BrowseUsers />
+    </section>
+  );
 };
 
 export default page;
