@@ -1,64 +1,80 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
+
 const prisma = new PrismaClient();
 
 async function main() {
-  // Create Skills
-  await prisma.skill.createMany({
-    data: [
-      { id: "skill1", name: "Web Development" },
-      { id: "skill2", name: "Graphic Design" },
-      { id: "skill3", name: "Public Speaking" },
-      { id: "skill4", name: "Excel" },
-      { id: "skill5", name: "Photoshop" },
-      { id: "skill6", name: "Digital Marketing" },
-      { id: "skill7", name: "Guitar" },
-      { id: "skill8", name: "Cooking" },
-    ],
-  });
+  // List of skill names to insert if they don't exist already
+  const skillNames = [
+    "Web Development",
+    "Graphic Design",
+    "Public Speaking",
+    "Excel",
+    "Photoshop",
+    "Digital Marketing",
+    "Guitar",
+    "Cooking",
+  ];
+
+  // Check if skills exist, and only create them if they don't
+  for (const skillName of skillNames) {
+    const existingSkill = await prisma.skill.findUnique({
+      where: { name: skillName },
+    });
+
+    if (!existingSkill) {
+      await prisma.skill.create({
+        data: { name: skillName },
+      });
+    }
+  }
 
   const users = [
     {
-      id: "user1",
       username: "alice",
       email: "alice@example.com",
       location: "Bangalore",
+      password: "password123", // Default password to hash
     },
     {
-      id: "user2",
       username: "bob",
       email: "bob@example.com",
       location: "Mumbai",
+      password: "password123",
     },
     {
-      id: "user3",
       username: "test1",
       email: "test1@example.com",
       location: "Delhi",
+      password: "password123",
     },
     {
-      id: "user4",
       username: "test2",
       email: "test2@example.com",
       location: "Kolkata",
+      password: "password123",
     },
     {
-      id: "user5",
       username: "test3",
       email: "test3@example.com",
       location: "Kolkata",
+      password: "password123",
     },
     {
-      id: "user6",
       username: "test4",
       email: "test4@example.com",
       location: "Pune",
+      password: "password123",
     },
   ];
 
   for (const user of users) {
+    const hashedPassword = await bcrypt.hash(user.password, 10); // Hash the password
+
     await prisma.user.create({
       data: {
         ...user,
+        password: hashedPassword, // Store hashed password
         profilePhoto: null,
         isPublic: true,
         role: "USER",
@@ -68,37 +84,31 @@ async function main() {
         skillsOffered: {
           create: [
             {
-              id: `uso_${user.id}_skill1`,
-              skill: { connect: { id: "skill1" } },
+              skill: { connect: { name: "Web Development" } },
             },
             {
-              id: `uso_${user.id}_skill2`,
-              skill: { connect: { id: "skill2" } },
+              skill: { connect: { name: "Graphic Design" } },
             },
           ],
         },
         skillsWanted: {
           create: [
             {
-              id: `usw_${user.id}_skill3`,
-              skill: { connect: { id: "skill3" } },
+              skill: { connect: { name: "Public Speaking" } },
             },
             {
-              id: `usw_${user.id}_skill4`,
-              skill: { connect: { id: "skill4" } },
+              skill: { connect: { name: "Excel" } },
             },
           ],
         },
         availabilities: {
           create: [
             {
-              id: `avail_${user.id}_1`,
               day: "MONDAY",
               startTime: "17:00",
               endTime: "19:00",
             },
             {
-              id: `avail_${user.id}_2`,
               day: "SATURDAY",
               startTime: "17:00",
               endTime: "19:00",
@@ -108,14 +118,15 @@ async function main() {
       },
     });
   }
+
+  console.log("Seed data inserted successfully.");
 }
 
 main()
-  .then(() => {
-    console.log("Seed data inserted successfully.");
-    return prisma.$disconnect();
-  })
   .catch((e) => {
     console.error("Error seeding data:", e);
-    return prisma.$disconnect().finally(() => process.exit(1));
+    prisma.$disconnect().finally(() => process.exit(1));
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
   });
