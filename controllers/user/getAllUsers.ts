@@ -9,6 +9,7 @@ export const getAllUsers = async (req: NextRequest) => {
         username: true,
         email: true,
         role: true,
+        profilePhoto:true,
         isPublic: true,
         createdAt: true,
 
