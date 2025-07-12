@@ -16,69 +16,56 @@ export const skillSwapRequest = async (req: NextRequest) => {
 
     const { fromUserId, toUserId, skillOfferedId, skillWantedId } = parsed.data;
 
-    // Check for existing swap
+    // ✅ Verify foreign key existence
+    const [fromUser, toUser, skillOffered, skillWanted] = await Promise.all([
+      prisma.user.findUnique({ where: { id: fromUserId } }),
+      prisma.user.findUnique({ where: { id: toUserId } }),
+      prisma.skill.findUnique({ where: { id: skillOfferedId } }),
+      prisma.skill.findUnique({ where: { id: skillWantedId } }),
+    ]);
+
+    if (!fromUser || !toUser || !skillOffered || !skillWanted) {
+      return NextResponse.json(
+        { error: "Invalid user or skill IDs." },
+        { status: 400 }
+      );
+    }
+
+    // ✅ Check if similar request already exists
     const existingSwap = await prisma.swapRequest.findFirst({
       where: {
         fromUserId,
         toUserId,
         skillOfferedId,
         skillWantedId,
+        status: "PENDING",
       },
     });
 
     if (existingSwap) {
       return NextResponse.json(
-        { error: "Swap request already exists." },
+        { error: "Swap request already exists and is pending." },
         { status: 409 }
       );
     }
 
-    // 1. Create the swap request
+    // ✅ Create new swap request only
     const newSwap = await prisma.swapRequest.create({
       data: {
         fromUserId,
         toUserId,
         skillOfferedId,
         skillWantedId,
+        status: "PENDING", // Default, but explicitly added for clarity
       },
     });
-
-    // 2. Add skillOffered to toUser's `skillsWanted` if not already added
-    const offeredAlreadyAdded = await prisma.userSkillWanted.findFirst({
-      where: {
-        userId: toUserId,
-        skillId: skillOfferedId,
-      },
-    });
-
-    if (!offeredAlreadyAdded) {
-      await prisma.userSkillWanted.create({
-        data: {
-          userId: toUserId,
-          skillId: skillOfferedId,
-        },
-      });
-    }
-
-    // 3. Add skillWanted to fromUser's `skillsOffered` if not already added
-    const wantedAlreadyAdded = await prisma.userSkillOffered.findFirst({
-      where: {
-        userId: fromUserId,
-        skillId: skillWantedId,
-      },
-    });
-
-    if (!wantedAlreadyAdded) {
-      await prisma.userSkillOffered.create({
-        data: {
-          userId: fromUserId,
-          skillId: skillWantedId,
-        },
-      });
-    }
 
     return NextResponse.json(
-      { message: "Swap request sent & skills updated", swapId: newSwap.id },
+      {
+        message: "Swap request created successfully",
+        swapId: newSwap.id,
+        status: newSwap.status,
+      },
       { status: 201 }
     );
   } catch (error) {

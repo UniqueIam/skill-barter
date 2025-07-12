@@ -1,4 +1,4 @@
-//skill swap
+//skill swap request
 
 import { skillSwapRequest } from "@/controllers/swap/skillSwapRequest";
 import { NextRequest } from "next/server";
