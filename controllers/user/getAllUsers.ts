@@ -9,7 +9,7 @@ export const getAllUsers = async (req: NextRequest) => {
         username: true,
         email: true,
         role: true,
-        profilePhoto:true,
+        profilePhoto: true,
         isPublic: true,
         createdAt: true,
 
@@ -44,7 +44,7 @@ export const getAllUsers = async (req: NextRequest) => {
           ...user,
           skillsOffered: user.skillsOffered.map((s) => s.skill),
           skillsWanted: user.skillsWanted.map((s) => s.skill),
-          ratings: ratings.map((r) => r.rating), 
+          ratings: ratings.map((r) => r.rating),
         };
       })
     );
@@ -52,6 +52,9 @@ export const getAllUsers = async (req: NextRequest) => {
     return NextResponse.json({ users: usersWithRatings }, { status: 200 });
   } catch (error) {
     console.error("[GET_USERS_ERROR]", error);
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to fetch users" },
+      { status: 500 }
+    );
   }
 };
