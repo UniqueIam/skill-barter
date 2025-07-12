@@ -10,6 +10,12 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --color-gray-primary: #030303;
+  --color-orange-primary: #fc8337;
+  --color-heading-col: #ffffff;
+  --color-body-col: #e5e0df;
+  --font-saira: var(--font-saira);
+  --font-roboto: var(--font-roboto);
 }
 
 body {

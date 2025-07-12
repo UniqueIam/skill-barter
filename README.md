@@ -1,3 +1,9 @@
+# 🔄 Team Members Details
+
+Gaurav Tiwari - gauravtiwari2509@gmail.com
+Vivek Kumar Tiwari - vivektiwarii4545@gmail.com
+Abhimanyu Kumar - abhimanyukumar83097@gmail.com
+
 # 🔄 Skill Swap Platform
 
 A modern full-stack web application that enables users to **offer and request skills**, facilitating a peer-to-peer learning ecosystem through skill-based collaboration.
