@@ -1,3 +1,8 @@
-import { skillSwapRequest } from "@/controllers/swap/skillSwapRequest";
+// app/api/swap-request/route.ts
 
-export const POST = skillSwapRequest;
+import { skillSwapRequest } from "@/controllers/swap/skillSwapRequest";
+import { NextRequest } from "next/server";
+
+export const POST = async (req: NextRequest) => {
+  return skillSwapRequest(req);
+};
