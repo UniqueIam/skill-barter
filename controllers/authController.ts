@@ -20,6 +20,10 @@ export const handleSignup = async (req: NextRequest, data: UserSignup) => {
       where: { username },
     });
 
+    const existingEmailUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
     if (existingUser) {
       if (existingUser.verified) {
         return NextResponse.json(
@@ -31,18 +35,30 @@ export const handleSignup = async (req: NextRequest, data: UserSignup) => {
       if (existingUser.otpExpiry && existingUser.otpExpiry > new Date()) {
         return NextResponse.json(
           { error: "Please verify the OTP sent to your email." },
-          { status: 201 }
+          { status: 409 }
         );
       } else {
         await prisma.user.delete({ where: { username } });
         return NextResponse.json(
           { message: "OTP expired. Please sign up again." },
-          { status: 201 }
+          { status: 409 }
         );
       }
     }
 
+    if (existingEmailUser && existingEmailUser.verified) {
+      return NextResponse.json(
+        { error: "Email is already registered." },
+        { status: 409 }
+      );
+    }
+
+    if (existingEmailUser && !existingEmailUser.verified) {
+      await prisma.user.delete({ where: { email } });
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
+
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
 
@@ -57,11 +73,21 @@ export const handleSignup = async (req: NextRequest, data: UserSignup) => {
       },
     });
 
-    await sendOTPEmail(email, otp);
+    try {
+      await sendOTPEmail(email, otp);
+    } catch (emailError) {
+      console.error("Error sending OTP email:", emailError);
+      await prisma.user.delete({ where: { id: user.id } });
+
+      return NextResponse.json(
+        { error: "Failed to send OTP email. Please try again." },
+        { status: 500 }
+      );
+    }
 
     return NextResponse.json(
-      { message: "OTP sent", userId: user.id },
-      { status: 201 }
+      { message: "OTP sent successfully", userId: user.id },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Signup error:", error);
