@@ -6,7 +6,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Public pages don't need auth
-  const publicPaths = ["/auth/signin", "/auth/signup", "/"];
+  const publicPaths = ["/auth/signin", "/auth/signup", "/", "/browse"];
 
   if (publicPaths.includes(pathname)) {
     return NextResponse.next();
@@ -31,5 +31,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/user/:path*", "/browse"],
+  matcher: ["/admin/:path*", "/user/:path*"],
 };
