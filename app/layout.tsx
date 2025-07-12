@@ -4,6 +4,7 @@ import "./globals.css";
 import { TanstackProviders } from "@/components/tanstackprovider";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import Dashboard from "@/components/Dashboard";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,6 +42,7 @@ export default function RootLayout({
       >
         <TanstackProviders>
           <Navbar />
+          <Dashboard />
           {children}
           <Footer />
         </TanstackProviders>

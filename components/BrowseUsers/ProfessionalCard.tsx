@@ -32,6 +32,7 @@ const ProfessionalCard = ({
       {skill}
     </span>
   );
+
   const handleRequestSwap = (professionalId: string) => {
     // Handle the request swap logic here
     console.log(`Requesting swap with professional ID: ${professionalId}`);
@@ -53,6 +54,7 @@ const ProfessionalCard = ({
       </div>
     );
   };
+
   return (
     <div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
