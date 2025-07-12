@@ -26,7 +26,7 @@ export default function VerifyOtp() {
   const { mutate, isPending, error } = useMutation({
     mutationFn: async (data: OtpInput) =>
       axios.post(API_ROUTES.AUTH.VERIFY_OTP, data),
-    onSuccess: () => router.push("/signin"),
+    onSuccess: () => router.push("/auth/signin"),
   });
 
   const onSubmit = (data: OtpInput) => {
