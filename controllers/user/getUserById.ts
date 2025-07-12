@@ -1,9 +1,17 @@
 import { prisma } from "@/db/prisma";
-import { NextResponse, NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const getUserById = async (req: NextRequest) => {
   try {
-    const users = await prisma.user.findMany({
+    const { searchParams } = new URL(req.url);
+    const userId = searchParams.get("id");
+
+    if (!userId) {
+      return NextResponse.json({ error: "User ID is required" }, { status: 400 });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
       select: {
         id: true,
         username: true,
@@ -11,6 +19,8 @@ export const getUserById = async (req: NextRequest) => {
         role: true,
         isPublic: true,
         createdAt: true,
+        profilePhoto: true,
+        location: true,
 
         skillsOffered: {
           select: {
@@ -26,31 +36,36 @@ export const getUserById = async (req: NextRequest) => {
             },
           },
         },
-      },
-      orderBy: {
-        createdAt: "desc",
+        availabilities: {
+          select: {
+            id: true,
+            day: true,
+            startTime: true,
+            endTime: true,
+          },
+        },
       },
     });
 
-    const usersWithRatings = await Promise.all(
-      users.map(async (user) => {
-        const ratings = await prisma.feedback.findMany({
-          where: { toUserId: user.id },
-          select: { rating: true },
-        });
+    if (!user) {
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    }
 
-        return {
-          ...user,
-          skillsOffered: user.skillsOffered.map((s) => s.skill),
-          skillsWanted: user.skillsWanted.map((s) => s.skill),
-          ratings: ratings.map((r) => r.rating), 
-        };
-      })
-    );
+    const ratings = await prisma.feedback.findMany({
+      where: { toUserId: userId },
+      select: { rating: true },
+    });
 
-    return NextResponse.json({ users: usersWithRatings }, { status: 200 });
+    const formattedUser = {
+      ...user,
+      skillsOffered: user.skillsOffered.map((s) => s.skill),
+      skillsWanted: user.skillsWanted.map((s) => s.skill),
+      ratings: ratings.map((r) => r.rating),
+    };
+
+    return NextResponse.json({ user: formattedUser }, { status: 200 });
   } catch (error) {
-    console.error("[GET_USERS_ERROR]", error);
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
+    console.error("[GET_USER_BY_ID_ERROR]", error);
+    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 });
   }
 };
