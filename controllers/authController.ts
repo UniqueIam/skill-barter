@@ -5,6 +5,8 @@ import { UserSignup } from "@/zodSchemas/signUpSchema";
 import bcrypt from "bcryptjs";
 import { NextRequest, NextResponse } from "next/server";
 
+
+
 export const handleSignup = async (req: NextRequest, data: UserSignup) => {
   try {
     const { username, email, password } = data;
